@@ -1,10 +1,10 @@
 import { AgentRunner } from './agent-runner.js';
-import { InMemorySessionStore } from './session-store.js';
+import type { SessionStore } from './session-store.js';
 import type { InboundMessage } from './types.js';
 
 export class Router {
   constructor(
-    private readonly store: InMemorySessionStore,
+    private readonly store: SessionStore,
     private readonly runner: AgentRunner,
   ) {}
 

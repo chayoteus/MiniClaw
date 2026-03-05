@@ -1,13 +1,16 @@
 import Fastify from 'fastify';
 import { z } from 'zod';
 import { Router } from './core/router.js';
-import { InMemorySessionStore } from './core/session-store.js';
+import { InMemorySessionStore, SqliteSessionStore, type SessionStore } from './core/session-store.js';
 import { AgentRunner } from './core/agent-runner.js';
 import { TelegramPoller } from './adapters/telegram-poller.js';
 
 const app = Fastify({ logger: true });
-const router = new Router(new InMemorySessionStore(), new AgentRunner());
 
+const storeMode = (process.env.SESSION_STORE || 'memory').toLowerCase();
+const dbPath = process.env.SQLITE_PATH || './miniclaw.db';
+const store: SessionStore = storeMode === 'sqlite' ? new SqliteSessionStore(dbPath) : new InMemorySessionStore();
+const router = new Router(store, new AgentRunner());
 app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 
 const inboundSchema = z.object({
@@ -37,6 +40,7 @@ app.post('/inbound', async (req, reply) => {
 const port = Number(process.env.PORT || 8787);
 app.listen({ port, host: '0.0.0.0' }).then(() => {
   app.log.info(`MiniClaw listening on :${port}`);
+  app.log.info(`Session store: ${storeMode}${storeMode === 'sqlite' ? ` (${dbPath})` : ''}`);
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
   if (botToken) {

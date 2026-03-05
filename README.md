@@ -50,6 +50,22 @@ curl -s -X POST localhost:8787/inbound \
   -d '{"userId":"u1","text":"hello"}'
 ```
 
+## Session store modes
+
+Default is in-memory:
+
+```bash
+npm run dev
+```
+
+Use SQLite persistence:
+
+```bash
+export SESSION_STORE=sqlite
+export SQLITE_PATH=./miniclaw.db
+npm run dev
+```
+
 ## Telegram adapter (long polling)
 
 Set bot token and run:

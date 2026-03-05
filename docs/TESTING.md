@@ -25,6 +25,19 @@ Expected:
 
 Send two messages with same `userId`, verify turn increments.
 
+### 4) SQLite persistence smoke (recommended)
+
+```bash
+export SESSION_STORE=sqlite
+export SQLITE_PATH=./miniclaw.test.db
+npm run dev
+```
+
+- Send one inbound message
+- Restart service
+- Send again with same `userId`
+- Verify continuity still works and DB file exists
+
 ## Planned tests
 
 ### Unit tests

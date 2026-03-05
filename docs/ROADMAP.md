@@ -7,12 +7,13 @@
 - [x] Core pipeline: router + session store + agent runner
 - [x] Telegram long-polling adapter
 
-## v0.1.1 (next)
+## v0.1.1 (in progress)
 
-- [ ] Session store interface abstraction
-- [ ] SQLite-backed store implementation
-- [ ] Config switch: memory vs sqlite
-- [ ] Docs + tests synced with storage changes
+- [x] Session store interface abstraction
+- [x] SQLite-backed store implementation
+- [x] Config switch: memory vs sqlite
+- [x] Docs synced with storage changes
+- [ ] Add store-focused tests
 
 ## v0.1.2
 

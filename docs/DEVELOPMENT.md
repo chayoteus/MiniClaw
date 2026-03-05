@@ -26,6 +26,8 @@ Use `.env` for local development, for example:
 ```env
 PORT=8787
 TELEGRAM_BOT_TOKEN=123456:ABC...
+SESSION_STORE=sqlite
+SQLITE_PATH=./miniclaw.db
 ```
 
 ## Build
