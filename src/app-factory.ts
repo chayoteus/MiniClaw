@@ -13,6 +13,17 @@ export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStor
   return { store: new InMemorySessionStore(), mode };
 }
 
+function errorEnvelope(code: string, message: string, details?: unknown) {
+  return {
+    ok: false,
+    error: {
+      code,
+      message,
+      ...(details ? { details } : {}),
+    },
+  };
+}
+
 export function createApp(store?: SessionStore) {
   const app = Fastify({ logger: true });
   const resolvedStore = store ?? createStoreFromEnv(process.env).store;
@@ -29,19 +40,26 @@ export function createApp(store?: SessionStore) {
   app.post('/inbound', async (req, reply) => {
     const parsed = inboundSchema.safeParse(req.body);
     if (!parsed.success) {
-      return reply.code(400).send({ ok: false, error: parsed.error.flatten() });
+      return reply
+        .code(400)
+        .send(errorEnvelope('INVALID_INBOUND_PAYLOAD', 'Invalid inbound payload', parsed.error.flatten()));
     }
 
     const body = parsed.data;
-    const out = router.handleInbound({
-      channel: 'webhook',
-      userId: body.userId,
-      threadId: body.threadId,
-      text: body.text,
-      ts: Date.now(),
-    });
+    try {
+      const out = router.handleInbound({
+        channel: 'webhook',
+        userId: body.userId,
+        threadId: body.threadId,
+        text: body.text,
+        ts: Date.now(),
+      });
 
-    return reply.send({ ok: true, sessionId: out.sessionId, response: out.response });
+      return reply.send({ ok: true, sessionId: out.sessionId, response: out.response });
+    } catch (err) {
+      req.log.error({ err }, 'inbound handling failed');
+      return reply.code(500).send(errorEnvelope('INTERNAL_ERROR', 'Failed to process inbound message'));
+    }
   });
 
   return { app, router };

@@ -33,4 +33,21 @@ describe('App', () => {
 
     await app.close();
   });
+
+  it('returns standardized error envelope on invalid payload', async () => {
+    const { app } = createApp(new InMemorySessionStore());
+    const res = await app.inject({
+      method: 'POST',
+      url: '/inbound',
+      payload: { text: 'missing user id' },
+    });
+
+    expect(res.statusCode).toBe(400);
+    const body = res.json();
+    expect(body.ok).toBe(false);
+    expect(body.error.code).toBe('INVALID_INBOUND_PAYLOAD');
+    expect(typeof body.error.message).toBe('string');
+
+    await app.close();
+  });
 });

@@ -45,6 +45,19 @@ Inbound Adapter (Webhook / Telegram Polling)
 6. assistant message appended to session store
 7. response returned as JSON
 
+Error contract (current):
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "INVALID_INBOUND_PAYLOAD",
+    "message": "Invalid inbound payload",
+    "details": {}
+  }
+}
+```
+
 ### Telegram path
 
 1. `TelegramPoller` polls `getUpdates`
