@@ -28,8 +28,10 @@ Inbound Adapter (Webhook / Telegram Polling)
   - Message orchestration and session id construction
 - `src/core/session-store.ts`
   - In-memory session history storage
+- `src/core/model-provider.ts`
+  - ModelProvider abstraction + default EchoModelProvider
 - `src/core/agent-runner.ts`
-  - Deterministic response logic (placeholder for model+tools)
+  - Runner that delegates text generation to ModelProvider
 - `src/adapters/telegram-poller.ts`
   - Telegram getUpdates + sendMessage adapter
 
