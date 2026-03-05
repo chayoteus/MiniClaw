@@ -18,7 +18,7 @@
 ## v0.1.2
 
 - [x] Agent runner context policy (history window)
-- [ ] Unified error envelope across adapters/routes
+- [x] Unified error envelope across adapters/routes
 - [ ] Better logging and trace IDs
 
 ## v0.2

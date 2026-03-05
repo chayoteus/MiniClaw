@@ -1,4 +1,5 @@
 import { Router } from '../core/router.js';
+import { errorEnvelope } from '../core/error-envelope.js';
 
 type TelegramUpdate = {
   update_id: number;
@@ -30,7 +31,12 @@ export class TelegramPoller {
           await this.handleUpdate(u);
         }
       } catch (err) {
-        console.error('[telegram] poll error:', err);
+        console.error(
+          '[telegram] poll error',
+          errorEnvelope('TELEGRAM_POLL_ERROR', 'Telegram polling loop failed', {
+            cause: err instanceof Error ? err.message : String(err),
+          }),
+        );
         await new Promise((r) => setTimeout(r, 1500));
       }
     }
@@ -55,7 +61,11 @@ export class TelegramPoller {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     });
-    if (!res.ok) throw new Error(`getUpdates http ${res.status}`);
+    if (!res.ok) {
+      throw new Error(
+        JSON.stringify(errorEnvelope('TELEGRAM_GET_UPDATES_HTTP_ERROR', `getUpdates http ${res.status}`)),
+      );
+    }
     const data = (await res.json()) as { ok: boolean; result?: TelegramUpdate[] };
     if (!data.ok || !Array.isArray(data.result)) return [];
     return data.result;
@@ -91,7 +101,13 @@ export class TelegramPoller {
     });
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(`sendMessage http ${res.status}: ${t}`);
+      throw new Error(
+        JSON.stringify(
+          errorEnvelope('TELEGRAM_SEND_MESSAGE_HTTP_ERROR', `sendMessage http ${res.status}`, {
+            responseText: t,
+          }),
+        ),
+      );
     }
     const outText = text.length > 240 ? `${text.slice(0, 240)}...` : text;
     console.info(`[telegram] outbound chat=${String(chatId)} text=${JSON.stringify(outText)}`);

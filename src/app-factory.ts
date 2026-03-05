@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Router } from './core/router.js';
 import { InMemorySessionStore, SqliteSessionStore, type SessionStore } from './core/session-store.js';
 import { AgentRunner } from './core/agent-runner.js';
+import { errorEnvelope } from './core/error-envelope.js';
 
 export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStore; mode: string; dbPath?: string } {
   const mode = (env.SESSION_STORE || 'memory').toLowerCase();
@@ -11,17 +12,6 @@ export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStor
     return { store: new SqliteSessionStore(dbPath), mode, dbPath };
   }
   return { store: new InMemorySessionStore(), mode };
-}
-
-function errorEnvelope(code: string, message: string, details?: unknown) {
-  return {
-    ok: false,
-    error: {
-      code,
-      message,
-      ...(details ? { details } : {}),
-    },
-  };
 }
 
 export function createApp(store?: SessionStore) {

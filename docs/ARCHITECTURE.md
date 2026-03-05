@@ -45,7 +45,7 @@ Inbound Adapter (Webhook / Telegram Polling)
 6. assistant message appended to session store
 7. response returned as JSON
 
-Error contract (current):
+Unified error contract (current, used by webhook responses and adapter error payloads):
 
 ```json
 {
