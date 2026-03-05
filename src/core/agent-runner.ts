@@ -1,11 +1,10 @@
-import type { AgentReply, ChatMessage, InboundMessage } from './types.js';
+import type { AgentReply, AgentRunInput } from './types.js';
 
 export class AgentRunner {
-  run(input: { inbound: InboundMessage; history: ChatMessage[] }): AgentReply {
+  run(input: AgentRunInput): AgentReply {
     const text = input.inbound.text.trim();
     if (!text) return { text: 'MiniClaw is online.' };
 
-    const turn = input.history.filter((m) => m.role === 'user').length + 1;
-    return { text: `Turn ${turn}: ${text}` };
+    return { text: `Turn ${input.turn}: ${text}` };
   }
 }

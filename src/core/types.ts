@@ -17,3 +17,9 @@ export type ChatMessage = {
 export type AgentReply = {
   text: string;
 };
+
+export type AgentRunInput = {
+  inbound: InboundMessage;
+  history: ChatMessage[];
+  turn: number;
+};

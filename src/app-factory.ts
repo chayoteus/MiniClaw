@@ -27,7 +27,8 @@ function errorEnvelope(code: string, message: string, details?: unknown) {
 export function createApp(store?: SessionStore) {
   const app = Fastify({ logger: true });
   const resolvedStore = store ?? createStoreFromEnv(process.env).store;
-  const router = new Router(resolvedStore, new AgentRunner());
+  const maxHistoryMessages = Number.parseInt(process.env.AGENT_HISTORY_WINDOW || '20', 10);
+  const router = new Router(resolvedStore, new AgentRunner(), Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages);
 
   app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 

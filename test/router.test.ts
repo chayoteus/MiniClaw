@@ -25,4 +25,16 @@ describe('Router', () => {
     expect(r2.sessionId).toBe('webhook:u1:default');
     expect(r2.response).toContain('Turn 2');
   });
+
+  it('keeps turn counter stable with small history window', () => {
+    const router = new Router(new InMemorySessionStore(), new AgentRunner(), 1);
+
+    const r1 = router.handleInbound({ channel: 'webhook', userId: 'u2', text: 'a', ts: Date.now() });
+    const r2 = router.handleInbound({ channel: 'webhook', userId: 'u2', text: 'b', ts: Date.now() });
+    const r3 = router.handleInbound({ channel: 'webhook', userId: 'u2', text: 'c', ts: Date.now() });
+
+    expect(r1.response).toContain('Turn 1');
+    expect(r2.response).toContain('Turn 2');
+    expect(r3.response).toContain('Turn 3');
+  });
 });

@@ -57,6 +57,16 @@ curl -s -X POST localhost:8787/inbound \
   -d '{"userId":"u1","text":"hello"}'
 ```
 
+## Agent context window
+
+Default history window is 20 messages:
+
+```bash
+export AGENT_HISTORY_WINDOW=20
+```
+
+Set `0` to disable truncation and pass full history to the runner.
+
 ## Session store modes
 
 Default is in-memory:
