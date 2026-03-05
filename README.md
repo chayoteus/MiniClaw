@@ -41,7 +41,14 @@ npm install
 npm run dev
 ```
 
-## HTTP test
+## Test
+
+```bash
+npm run build
+npm test
+```
+
+## HTTP smoke test
 
 ```bash
 curl -s localhost:8787/health

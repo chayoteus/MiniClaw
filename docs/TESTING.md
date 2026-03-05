@@ -2,6 +2,17 @@
 
 ## Current test levels
 
+### 0) Automated test suite (Vitest)
+
+```bash
+npm test
+```
+
+Current tests:
+- `test/session-store.test.ts`
+- `test/router.test.ts`
+- `test/app.test.ts`
+
 ### 1) Build check (mandatory)
 
 ```bash

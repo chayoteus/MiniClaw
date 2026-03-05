@@ -44,7 +44,12 @@ npm start
 npm run build
 ```
 
-2. Smoke test HTTP endpoints
+2. Unit/integration test suite
+```bash
+npm test
+```
+
+3. Smoke test HTTP endpoints
 ```bash
 curl -s localhost:8787/health
 curl -s -X POST localhost:8787/inbound \
@@ -52,7 +57,7 @@ curl -s -X POST localhost:8787/inbound \
   -d '{"userId":"u1","text":"hello"}'
 ```
 
-3. If Telegram changes were made, test bot reply loop manually.
+4. If Telegram changes were made, test bot reply loop manually.
 
 ## Commit style
 
