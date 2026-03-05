@@ -67,6 +67,11 @@ export class TelegramPoller {
 
     const userId = String(msg.from?.id ?? msg.chat.id);
     const threadId = msg.chat.type === 'private' ? undefined : String(msg.chat.id);
+    const inboundText = msg.text.length > 240 ? `${msg.text.slice(0, 240)}...` : msg.text;
+    console.info(
+      `[telegram] inbound chat=${String(msg.chat.id)} user=${userId} text=${JSON.stringify(inboundText)}`,
+    );
+
     const out = this.router.handleInbound({
       channel: 'telegram',
       userId,
@@ -88,5 +93,7 @@ export class TelegramPoller {
       const t = await res.text();
       throw new Error(`sendMessage http ${res.status}: ${t}`);
     }
+    const outText = text.length > 240 ? `${text.slice(0, 240)}...` : text;
+    console.info(`[telegram] outbound chat=${String(chatId)} text=${JSON.stringify(outText)}`);
   }
 }
