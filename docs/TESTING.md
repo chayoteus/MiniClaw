@@ -9,7 +9,7 @@ npm test
 ```
 
 Current tests:
-- `test/session-store.test.ts`
+- `test/session-store.test.ts` (in-memory + sqlite persistence/limit)
 - `test/router.test.ts`
 - `test/app.test.ts`
 

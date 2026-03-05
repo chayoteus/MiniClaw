@@ -13,7 +13,7 @@
 - [x] SQLite-backed store implementation
 - [x] Config switch: memory vs sqlite
 - [x] Docs synced with storage changes
-- [ ] Add store-focused tests
+- [x] Add store-focused tests
 
 ## v0.1.2
 
