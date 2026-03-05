@@ -22,7 +22,7 @@ Adapter (Telegram/Web)
 
 ## Milestones
 
-- [ ] v0.1: message in -> model -> message out (Telegram)
+- [x] v0.1: message in -> model -> message out (Telegram)
 - [ ] v0.1.1: SQLite session memory
 - [ ] v0.2: tool calling loop (exec + web_search)
 - [ ] v0.3: mini-gateway bus abstraction
@@ -62,3 +62,10 @@ npm run dev
 Then message your bot in Telegram. MiniClaw will route inbound text through the same core pipeline and reply.
 
 > Note: this is a minimal educational adapter (polling mode). Webhook + richer Telegram features can be added later.
+
+## Documentation
+
+- `docs/ARCHITECTURE.md` — module map and request flow
+- `docs/ROADMAP.md` — build plan by versions
+- `docs/DEVELOPMENT.md` — local dev workflow
+- `docs/TESTING.md` — testing strategy
