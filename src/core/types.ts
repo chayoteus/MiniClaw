@@ -1,5 +1,5 @@
 export type InboundMessage = {
-  channel: 'webhook';
+  channel: 'webhook' | 'telegram';
   userId: string;
   threadId?: string;
   text: string;

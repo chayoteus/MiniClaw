@@ -37,8 +37,28 @@ Adapter (Telegram/Web)
 ## Getting started
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
-(Scaffold in progress.)
+## HTTP test
+
+```bash
+curl -s localhost:8787/health
+curl -s -X POST localhost:8787/inbound \
+  -H 'content-type: application/json' \
+  -d '{"userId":"u1","text":"hello"}'
+```
+
+## Telegram adapter (long polling)
+
+Set bot token and run:
+
+```bash
+export TELEGRAM_BOT_TOKEN=123456:ABC...
+npm run dev
+```
+
+Then message your bot in Telegram. MiniClaw will route inbound text through the same core pipeline and reply.
+
+> Note: this is a minimal educational adapter (polling mode). Webhook + richer Telegram features can be added later.
