@@ -1,16 +1,36 @@
 import Fastify from 'fastify';
+import { z } from 'zod';
+import { Router } from './core/router.js';
+import { InMemorySessionStore } from './core/session-store.js';
+import { AgentRunner } from './core/agent-runner.js';
 
 const app = Fastify({ logger: true });
+const router = new Router(new InMemorySessionStore(), new AgentRunner());
 
 app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 
-app.post('/inbound', async (req, reply) => {
-  const body = req.body as Record<string, unknown>;
-  const text = typeof body?.text === 'string' ? body.text : '';
+const inboundSchema = z.object({
+  userId: z.string().min(1),
+  threadId: z.string().optional(),
+  text: z.string().default(''),
+});
 
-  // v0.1 placeholder: echo pipeline
-  const response = text ? `MiniClaw echo: ${text}` : 'MiniClaw is online.';
-  return reply.send({ ok: true, response });
+app.post('/inbound', async (req, reply) => {
+  const parsed = inboundSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return reply.code(400).send({ ok: false, error: parsed.error.flatten() });
+  }
+
+  const body = parsed.data;
+  const out = router.handleInbound({
+    channel: 'webhook',
+    userId: body.userId,
+    threadId: body.threadId,
+    text: body.text,
+    ts: Date.now(),
+  });
+
+  return reply.send({ ok: true, sessionId: out.sessionId, response: out.response });
 });
 
 const port = Number(process.env.PORT || 8787);
