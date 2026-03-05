@@ -22,6 +22,7 @@ describe('App', () => {
     });
     expect(r1.statusCode).toBe(200);
     expect(r1.json().response).toContain('Turn 1');
+    expect(typeof r1.json().traceId).toBe('string');
 
     const r2 = await app.inject({
       method: 'POST',

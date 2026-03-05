@@ -32,9 +32,12 @@ export class TelegramPoller {
         }
       } catch (err) {
         console.error(
-          '[telegram] poll error',
-          errorEnvelope('TELEGRAM_POLL_ERROR', 'Telegram polling loop failed', {
-            cause: err instanceof Error ? err.message : String(err),
+          JSON.stringify({
+            traceId: `tg-poll-${Date.now()}`,
+            event: 'telegram.poll.error',
+            error: errorEnvelope('TELEGRAM_POLL_ERROR', 'Telegram polling loop failed', {
+              cause: err instanceof Error ? err.message : String(err),
+            }),
           }),
         );
         await new Promise((r) => setTimeout(r, 1500));
@@ -75,11 +78,18 @@ export class TelegramPoller {
     const msg = update.message;
     if (!msg || !msg.text) return;
 
+    const traceId = `tg-${update.update_id}`;
     const userId = String(msg.from?.id ?? msg.chat.id);
     const threadId = msg.chat.type === 'private' ? undefined : String(msg.chat.id);
     const inboundText = msg.text.length > 240 ? `${msg.text.slice(0, 240)}...` : msg.text;
     console.info(
-      `[telegram] inbound chat=${String(msg.chat.id)} user=${userId} text=${JSON.stringify(inboundText)}`,
+      JSON.stringify({
+        traceId,
+        event: 'telegram.inbound',
+        chatId: String(msg.chat.id),
+        userId,
+        text: inboundText,
+      }),
     );
 
     const out = this.router.handleInbound({
@@ -90,10 +100,10 @@ export class TelegramPoller {
       ts: Date.now(),
     });
 
-    await this.sendMessage(msg.chat.id, out.response);
+    await this.sendMessage(msg.chat.id, out.response, traceId);
   }
 
-  private async sendMessage(chatId: number | string, text: string): Promise<void> {
+  private async sendMessage(chatId: number | string, text: string, traceId: string): Promise<void> {
     const res = await fetch(this.api('sendMessage'), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -110,6 +120,13 @@ export class TelegramPoller {
       );
     }
     const outText = text.length > 240 ? `${text.slice(0, 240)}...` : text;
-    console.info(`[telegram] outbound chat=${String(chatId)} text=${JSON.stringify(outText)}`);
+    console.info(
+      JSON.stringify({
+        traceId,
+        event: 'telegram.outbound',
+        chatId: String(chatId),
+        text: outText,
+      }),
+    );
   }
 }

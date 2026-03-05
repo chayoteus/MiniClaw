@@ -46,7 +46,8 @@ export function createApp(store?: SessionStore) {
         ts: Date.now(),
       });
 
-      return reply.send({ ok: true, sessionId: out.sessionId, response: out.response });
+      req.log.info({ traceId: req.id, sessionId: out.sessionId, channel: 'webhook' }, 'inbound handled');
+      return reply.send({ ok: true, traceId: req.id, sessionId: out.sessionId, response: out.response });
     } catch (err) {
       req.log.error({ err }, 'inbound handling failed');
       return reply.code(500).send(errorEnvelope('INTERNAL_ERROR', 'Failed to process inbound message'));

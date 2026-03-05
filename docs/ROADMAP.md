@@ -19,7 +19,7 @@
 
 - [x] Agent runner context policy (history window)
 - [x] Unified error envelope across adapters/routes
-- [ ] Better logging and trace IDs
+- [x] Better logging and trace IDs
 
 ## v0.2
 

@@ -55,6 +55,7 @@ curl -s localhost:8787/health
 curl -s -X POST localhost:8787/inbound \
   -H 'content-type: application/json' \
   -d '{"userId":"u1","text":"hello"}'
+# response now includes traceId for request-level correlation
 ```
 
 ## Agent context window
