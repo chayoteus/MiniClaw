@@ -35,7 +35,7 @@
 
 ## v0.4 (OAuth + real LLM)
 
-- [ ] CLI auth flow: print OAuth URL (`miniclaw auth login`)
+- [x] CLI auth flow: print OAuth URL (`miniclaw auth login`)
 - [ ] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url>`)
 - [ ] PKCE + state verification
 - [ ] Access/refresh token exchange and secure local storage

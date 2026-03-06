@@ -158,20 +158,27 @@ Then message your bot in Telegram. MiniClaw will route inbound text through the 
 
 > Note: this is a minimal educational adapter (polling mode). Webhook + richer Telegram features can be added later.
 
-## Planned OAuth CLI flow (v0.4)
+## OAuth CLI flow (v0.4, in progress)
 
-Target UX:
+Current status:
 
 ```bash
-miniclaw auth login
-# CLI prints OAuth URL
-# user logs in via browser
+OPENAI_OAUTH_CLIENT_ID=...
+OPENAI_OAUTH_REDIRECT_URI=...
+npm run cli -- auth login
+```
+
+`auth login` now prints an OpenAI OAuth authorize URL and temporary PKCE values (`state`, `code_verifier`) for manual testing.
+
+Planned next commands:
+
+```bash
 miniclaw auth complete "<callback_url_from_browser>"
 miniclaw auth status
 miniclaw auth logout
 ```
 
-This flow will use Authorization Code + PKCE and store tokens locally for OpenAI provider calls.
+Final target remains Authorization Code + PKCE with secure local token storage for OpenAI provider calls.
 
 ## Documentation
 
