@@ -84,6 +84,25 @@ export SQLITE_PATH=./miniclaw.db
 npm run dev
 ```
 
+## Tool calling loop (v0.2)
+
+MiniClaw now supports a minimal tool runtime. If model output follows:
+
+```text
+TOOL_CALL {"name":"text.uppercase","args":{"text":"hello"}}
+```
+
+AgentRunner executes the tool and returns:
+
+```text
+[tool:text.uppercase:ok] HELLO
+```
+
+Built-in demo tools:
+
+- `time.now`
+- `text.uppercase`
+
 ## Telegram adapter (long polling)
 
 Set bot token and run:

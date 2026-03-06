@@ -24,8 +24,8 @@
 ## v0.2
 
 - [x] Model provider abstraction
-- [ ] Minimal tool runtime (1-2 tools)
-- [ ] Demonstrate model -> tool -> result loop
+- [x] Minimal tool runtime (1-2 tools)
+- [x] Demonstrate model -> tool -> result loop
 
 ## v0.3
 

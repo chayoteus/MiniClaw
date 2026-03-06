@@ -20,6 +20,23 @@ describe('AgentRunner', () => {
     expect(out.text).toBe('mock:3:hello:1');
   });
 
+  it('executes tool call emitted by model output', () => {
+    const provider: ModelProvider = {
+      generate() {
+        return 'TOOL_CALL {"name":"text.uppercase","args":{"text":"mini"}}';
+      },
+    };
+
+    const runner = new AgentRunner(provider);
+    const out = runner.run({
+      inbound: { channel: 'webhook', userId: 'u1', text: 'run tool', ts: Date.now() },
+      history: [],
+      turn: 1,
+    });
+
+    expect(out.text).toBe('[tool:text.uppercase:ok] MINI');
+  });
+
   it('uses default echo model provider when none injected', () => {
     const runner = new AgentRunner();
     const out = runner.run({
