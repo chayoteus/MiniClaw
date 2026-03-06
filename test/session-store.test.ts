@@ -24,6 +24,17 @@ describe('InMemorySessionStore', () => {
     expect(history[0]?.content).toBe('m25');
     expect(history[4]?.content).toBe('m29');
   });
+
+  it('returns full history when limit is omitted', () => {
+    const s = new InMemorySessionStore();
+    for (let i = 0; i < 30; i++) {
+      s.append('sess', { role: 'user', content: `m${i}`, ts: i });
+    }
+    const history = s.getHistory('sess');
+    expect(history).toHaveLength(30);
+    expect(history[0]?.content).toBe('m0');
+    expect(history[29]?.content).toBe('m29');
+  });
 });
 
 describe('SqliteSessionStore', () => {
@@ -60,6 +71,25 @@ describe('SqliteSessionStore', () => {
     expect(history).toHaveLength(5);
     expect(history[0]?.content).toBe('m25');
     expect(history[4]?.content).toBe('m29');
+
+    rmSync(dbPath, { force: true });
+    rmSync(`${dbPath}-shm`, { force: true });
+    rmSync(`${dbPath}-wal`, { force: true });
+  });
+
+  it('returns full history when limit is omitted', () => {
+    const dbPath = `/tmp/miniclaw-test-${Date.now()}-all.db`;
+    rmSync(dbPath, { force: true });
+
+    const s = new SqliteSessionStore(dbPath);
+    for (let i = 0; i < 30; i++) {
+      s.append('sess', { role: 'user', content: `m${i}`, ts: i });
+    }
+
+    const history = s.getHistory('sess');
+    expect(history).toHaveLength(30);
+    expect(history[0]?.content).toBe('m0');
+    expect(history[29]?.content).toBe('m29');
 
     rmSync(dbPath, { force: true });
     rmSync(`${dbPath}-shm`, { force: true });

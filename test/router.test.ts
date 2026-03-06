@@ -47,6 +47,33 @@ describe('Router', () => {
     expect(r3.history.length).toBe(1);
   });
 
+  it('keeps turn counter correct beyond 20 stored messages', () => {
+    const router = new Router(new InMemorySessionStore());
+
+    for (let i = 1; i <= 12; i++) {
+      const inbound = router.ingestInbound({
+        channel: 'webhook',
+        userId: 'u-long',
+        text: `u${i}`,
+        ts: Date.now(),
+      });
+      expect(inbound.turn).toBe(i);
+      router.emitAssistant(inbound.sessionId, 'webhook', `a${i}`);
+    }
+
+    const next = router.ingestInbound({
+      channel: 'webhook',
+      userId: 'u-long',
+      text: 'u13',
+      ts: Date.now(),
+    });
+
+    expect(next.turn).toBe(13);
+    expect(next.history).toHaveLength(20);
+    expect(next.history[0]?.content).toBe('u3');
+    expect(next.history[19]?.content).toBe('a12');
+  });
+
   it('publishes inbound and outbound events via event bus', () => {
     const bus = new InMemoryEventBus();
     const router = new Router(new InMemorySessionStore(), 20, bus);

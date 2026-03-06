@@ -11,6 +11,13 @@ type TelegramUpdate = {
   };
 };
 
+type TelegramApiResponse<T> = {
+  ok: boolean;
+  result?: T;
+  error_code?: number;
+  description?: string;
+};
+
 export class TelegramPoller {
   private running = false;
   private offset = 0;
@@ -32,8 +39,8 @@ export class TelegramPoller {
     try {
       const updates = await this.getUpdates();
       for (const u of updates) {
-        this.offset = Math.max(this.offset, u.update_id + 1);
         await this.handleUpdate(u);
+        this.offset = Math.max(this.offset, u.update_id + 1);
       }
     } catch (err) {
       console.error(
@@ -68,13 +75,33 @@ export class TelegramPoller {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
     });
+    const raw = await res.text();
+    let data: TelegramApiResponse<TelegramUpdate[]> | null = null;
+    try {
+      data = JSON.parse(raw) as TelegramApiResponse<TelegramUpdate[]>;
+    } catch {
+      data = null;
+    }
+
     if (!res.ok) {
       throw new Error(
-        JSON.stringify(errorEnvelope('TELEGRAM_GET_UPDATES_HTTP_ERROR', `getUpdates http ${res.status}`)),
+        JSON.stringify(
+          errorEnvelope('TELEGRAM_GET_UPDATES_HTTP_ERROR', `getUpdates http ${res.status}`, {
+            responseText: raw,
+          }),
+        ),
       );
     }
-    const data = (await res.json()) as { ok: boolean; result?: TelegramUpdate[] };
-    if (!data.ok || !Array.isArray(data.result)) return [];
+    if (!data?.ok) {
+      throw new Error(
+        JSON.stringify(
+          errorEnvelope('TELEGRAM_GET_UPDATES_API_ERROR', data?.description || 'getUpdates api error', {
+            errorCode: data?.error_code,
+          }),
+        ),
+      );
+    }
+    if (!Array.isArray(data.result)) return [];
     return data.result;
   }
 
@@ -113,16 +140,33 @@ export class TelegramPoller {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text }),
     });
+    const raw = await res.text();
+    let data: TelegramApiResponse<unknown> | null = null;
+    try {
+      data = JSON.parse(raw) as TelegramApiResponse<unknown>;
+    } catch {
+      data = null;
+    }
+
     if (!res.ok) {
-      const t = await res.text();
       throw new Error(
         JSON.stringify(
           errorEnvelope('TELEGRAM_SEND_MESSAGE_HTTP_ERROR', `sendMessage http ${res.status}`, {
-            responseText: t,
+            responseText: raw,
           }),
         ),
       );
     }
+    if (!data?.ok) {
+      throw new Error(
+        JSON.stringify(
+          errorEnvelope('TELEGRAM_SEND_MESSAGE_API_ERROR', data?.description || 'sendMessage api error', {
+            errorCode: data?.error_code,
+          }),
+        ),
+      );
+    }
+
     const outText = text.length > 240 ? `${text.slice(0, 240)}...` : text;
     console.info(
       JSON.stringify({

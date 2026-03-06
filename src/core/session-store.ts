@@ -9,8 +9,9 @@ export interface SessionStore {
 export class InMemorySessionStore implements SessionStore {
   private sessions = new Map<string, ChatMessage[]>();
 
-  getHistory(sessionId: string, limit = 20): ChatMessage[] {
+  getHistory(sessionId: string, limit?: number): ChatMessage[] {
     const all = this.sessions.get(sessionId) ?? [];
+    if (typeof limit !== 'number') return [...all];
     return all.slice(Math.max(0, all.length - limit));
   }
 
@@ -40,17 +41,33 @@ export class SqliteSessionStore implements SessionStore {
     `);
   }
 
-  getHistory(sessionId: string, limit = 20): ChatMessage[] {
+  getHistory(sessionId: string, limit?: number): ChatMessage[] {
+    if (typeof limit === 'number') {
+      const stmt = this.db.prepare(
+        `SELECT role, content, ts FROM messages
+         WHERE session_id = ?
+         ORDER BY ts DESC, id DESC
+         LIMIT ?`,
+      );
+      const rows = stmt.all(sessionId, limit) as Array<{ role: string; content: string; ts: number }>;
+      return rows.reverse().map((r) => ({
+        role: (r.role === 'assistant' ? 'assistant' : 'user') as ChatMessage['role'],
+        content: r.content,
+        ts: r.ts,
+      }));
+    }
+
     const stmt = this.db.prepare(
       `SELECT role, content, ts FROM messages
        WHERE session_id = ?
-       ORDER BY ts DESC, id DESC
-       LIMIT ?`,
+       ORDER BY ts ASC, id ASC`,
     );
-    const rows = stmt.all(sessionId, limit) as Array<{ role: string; content: string; ts: number }>;
-    return rows
-      .reverse()
-      .map((r) => ({ role: (r.role === 'assistant' ? 'assistant' : 'user') as ChatMessage['role'], content: r.content, ts: r.ts }));
+    const rows = stmt.all(sessionId) as Array<{ role: string; content: string; ts: number }>;
+    return rows.map((r) => ({
+      role: (r.role === 'assistant' ? 'assistant' : 'user') as ChatMessage['role'],
+      content: r.content,
+      ts: r.ts,
+    }));
   }
 
   append(sessionId: string, message: ChatMessage): void {
