@@ -39,6 +39,7 @@ Adapter (Telegram/Web)
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 

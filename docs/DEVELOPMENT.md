@@ -21,13 +21,21 @@ Default port: `8787` (override with `PORT`).
 
 ## Environment
 
-Use `.env` for local development, for example:
+Use `.env` for local development:
+
+```bash
+cp .env.example .env
+```
+
+Example values:
 
 ```env
 PORT=8787
 TELEGRAM_BOT_TOKEN=123456:ABC...
 SESSION_STORE=sqlite
 SQLITE_PATH=./miniclaw.db
+MODEL_PROVIDER=echo
+AGENT_HISTORY_WINDOW=20
 ```
 
 ## Build
