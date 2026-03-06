@@ -11,14 +11,34 @@ A minimal, educational agent runtime inspired by OpenClaw.
 ## Architecture (v0.1)
 
 ```text
-Adapter (Telegram/Web)
-  -> MessageOrchestrator
-    -> Router
-      -> SessionStore (SQLite)
-    -> AgentRunner
-      -> ModelProvider
-      -> ToolRuntime
-  -> Sender
+Inbound
+  1) Webhook: POST /inbound  OR  Telegram: getUpdates
+                           |
+                           v
+  2) MessageOrchestrator.handleInbound(msg)
+                           |
+                           v
+  3) Router.ingestInbound(msg)
+       - builds sessionId
+       - loads history from SessionStore (memory/sqlite)
+       - appends user message
+                           |
+                           v
+  4) AgentRunner.run({ inbound, history, turn })
+       -> ModelProvider.generate(...)
+       -> if output is TOOL_CALL, ToolRuntime.execute(...)
+                           |
+                           v
+  5) assistant response text
+                           |
+                           v
+  6) Router.emitAssistant(sessionId, channel, text)
+       - appends assistant message
+                           |
+                           v
+Outbound
+  7a) Webhook returns JSON: { ok, traceId, sessionId, response }
+  7b) Telegram adapter calls sendMessage(chat_id, response)
 ```
 
 ## Milestones
