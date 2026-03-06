@@ -24,24 +24,28 @@ export class TelegramPoller {
     if (this.running) return;
     this.running = true;
     while (this.running) {
-      try {
-        const updates = await this.getUpdates();
-        for (const u of updates) {
-          this.offset = Math.max(this.offset, u.update_id + 1);
-          await this.handleUpdate(u);
-        }
-      } catch (err) {
-        console.error(
-          JSON.stringify({
-            traceId: `tg-poll-${Date.now()}`,
-            event: 'telegram.poll.error',
-            error: errorEnvelope('TELEGRAM_POLL_ERROR', 'Telegram polling loop failed', {
-              cause: err instanceof Error ? err.message : String(err),
-            }),
-          }),
-        );
-        await new Promise((r) => setTimeout(r, 1500));
+      await this.pollOnce();
+    }
+  }
+
+  async pollOnce(): Promise<void> {
+    try {
+      const updates = await this.getUpdates();
+      for (const u of updates) {
+        this.offset = Math.max(this.offset, u.update_id + 1);
+        await this.handleUpdate(u);
       }
+    } catch (err) {
+      console.error(
+        JSON.stringify({
+          traceId: `tg-poll-${Date.now()}`,
+          event: 'telegram.poll.error',
+          error: errorEnvelope('TELEGRAM_POLL_ERROR', 'Telegram polling loop failed', {
+            cause: err instanceof Error ? err.message : String(err),
+          }),
+        }),
+      );
+      await new Promise((r) => setTimeout(r, 1500));
     }
   }
 
