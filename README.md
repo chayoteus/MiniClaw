@@ -27,6 +27,7 @@ Adapter (Telegram/Web)
 - [x] v0.1.1: SQLite session memory
 - [x] v0.2: tool calling loop (minimal runtime)
 - [x] v0.3: mini-gateway bus abstraction + adapter/orchestrator decoupling + provider plug baseline
+- [ ] v0.4: OAuth CLI login flow + real OpenAI provider integration
 
 ## Tech
 
@@ -136,6 +137,21 @@ npm run dev
 Then message your bot in Telegram. MiniClaw will route inbound text through the same core pipeline and reply.
 
 > Note: this is a minimal educational adapter (polling mode). Webhook + richer Telegram features can be added later.
+
+## Planned OAuth CLI flow (v0.4)
+
+Target UX:
+
+```bash
+miniclaw auth login
+# CLI prints OAuth URL
+# user logs in via browser
+miniclaw auth complete "<callback_url_from_browser>"
+miniclaw auth status
+miniclaw auth logout
+```
+
+This flow will use Authorization Code + PKCE and store tokens locally for OpenAI provider calls.
 
 ## Documentation
 

@@ -33,6 +33,17 @@
 - [x] Decouple adapters from direct runner invocation (via MessageOrchestrator)
 - [x] Prepare for pluggable channels/providers (env-selected model provider baseline)
 
+## v0.4 (OAuth + real LLM)
+
+- [ ] CLI auth flow: print OAuth URL (`miniclaw auth login`)
+- [ ] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url>`)
+- [ ] PKCE + state verification
+- [ ] Access/refresh token exchange and secure local storage
+- [ ] Token auto-refresh for provider calls
+- [ ] OpenAI provider integration using OAuth access token
+- [ ] `auth status` / `auth logout` commands
+- [ ] Tests + docs for auth and provider path
+
 ## Non-goals (for now)
 
 - Full OpenClaw parity
