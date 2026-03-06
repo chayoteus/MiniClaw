@@ -26,7 +26,7 @@ Adapter (Telegram/Web)
 - [x] v0.1: message in -> model -> message out (Telegram)
 - [x] v0.1.1: SQLite session memory
 - [x] v0.2: tool calling loop (minimal runtime)
-- [x] v0.3: mini-gateway bus abstraction + adapter/orchestrator decoupling
+- [x] v0.3: mini-gateway bus abstraction + adapter/orchestrator decoupling + provider plug baseline
 
 ## Tech
 
@@ -84,6 +84,24 @@ export SESSION_STORE=sqlite
 export SQLITE_PATH=./miniclaw.db
 npm run dev
 ```
+
+## Model provider mode (v0.3 baseline)
+
+Default provider is `echo`:
+
+```bash
+export MODEL_PROVIDER=echo
+```
+
+Optional demo rule provider:
+
+```bash
+export MODEL_PROVIDER=rule
+```
+
+When `rule` is enabled:
+- `upper hello` triggers `text.uppercase`
+- `time` triggers `time.now`
 
 ## Tool calling loop (v0.2)
 

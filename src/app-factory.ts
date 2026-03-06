@@ -6,6 +6,7 @@ import { AgentRunner } from './core/agent-runner.js';
 import { InMemoryEventBus } from './core/bus.js';
 import { errorEnvelope } from './core/error-envelope.js';
 import { MessageOrchestrator } from './core/message-orchestrator.js';
+import { createModelProviderFromEnv } from './core/model-provider.js';
 
 export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStore; mode: string; dbPath?: string } {
   const mode = (env.SESSION_STORE || 'memory').toLowerCase();
@@ -22,7 +23,8 @@ export function createApp(store?: SessionStore) {
   const maxHistoryMessages = Number.parseInt(process.env.AGENT_HISTORY_WINDOW || '20', 10);
   const bus = new InMemoryEventBus();
   const router = new Router(resolvedStore, Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages, bus);
-  const orchestrator = new MessageOrchestrator(router, new AgentRunner());
+  const modelProvider = createModelProviderFromEnv(process.env);
+  const orchestrator = new MessageOrchestrator(router, new AgentRunner(modelProvider));
 
   app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 

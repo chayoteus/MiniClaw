@@ -31,7 +31,7 @@
 
 - [x] Mini-gateway bus abstraction (in-memory first, core pub/sub scaffold)
 - [x] Decouple adapters from direct runner invocation (via MessageOrchestrator)
-- [ ] Prepare for pluggable channels/providers
+- [x] Prepare for pluggable channels/providers (env-selected model provider baseline)
 
 ## Non-goals (for now)
 

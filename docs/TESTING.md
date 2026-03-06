@@ -12,6 +12,8 @@ Current tests:
 - `test/session-store.test.ts` (in-memory + sqlite persistence/limit)
 - `test/router.test.ts`
 - `test/app.test.ts`
+- `test/agent-runner.test.ts` (provider delegation + tool loop)
+- `test/model-provider.test.ts` (env provider factory)
 
 ### 1) Build check (mandatory)
 

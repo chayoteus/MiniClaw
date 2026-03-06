@@ -35,7 +35,7 @@ Inbound Adapter (Webhook / Telegram Polling)
 - `src/core/bus.ts`
   - Event bus contract + in-memory/no-op implementations
 - `src/core/model-provider.ts`
-  - ModelProvider abstraction + default EchoModelProvider
+  - ModelProvider abstraction + env-based provider factory (`echo`/`rule`)
 - `src/core/agent-runner.ts`
   - Runner that delegates text generation to ModelProvider
 - `src/adapters/telegram-poller.ts`
@@ -84,7 +84,6 @@ Examples:
 
 ## Planned evolution
 
-- Replace in-memory store with SQLite backend
-- Add model provider abstraction
-- Add tool runtime loop
-- Extend event bus from in-memory pub/sub into mini-gateway transport (v0.3)
+- Add pluggable channel adapter contract (beyond current webhook/Telegram implementations)
+- Extend event bus from in-memory pub/sub into mini-gateway transport (post-v0.3)
+- Add integration tests for adapter-level contracts

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { AgentRunner } from '../src/core/agent-runner.js';
-import type { ModelProvider } from '../src/core/model-provider.js';
+import { RuleModelProvider, type ModelProvider } from '../src/core/model-provider.js';
 
 describe('AgentRunner', () => {
   it('delegates generation to model provider', () => {
@@ -46,5 +46,16 @@ describe('AgentRunner', () => {
     });
 
     expect(out.text).toBe('MiniClaw is online.');
+  });
+
+  it('supports rule provider for tool-trigger prompts', () => {
+    const runner = new AgentRunner(new RuleModelProvider());
+    const out = runner.run({
+      inbound: { channel: 'webhook', userId: 'u1', text: 'upper mini', ts: Date.now() },
+      history: [],
+      turn: 1,
+    });
+
+    expect(out.text).toBe('[tool:text.uppercase:ok] MINI');
   });
 });
