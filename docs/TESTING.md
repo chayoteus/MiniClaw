@@ -2,11 +2,20 @@
 
 ## Current test levels
 
-### 0) Automated test suite (Vitest)
+### 0) Automated health check (build + test)
+
+```bash
+npm run check
+```
+
+(Equivalent to `npm run build && npm test`.)
+
+### 1) Automated test suite (Vitest)
 
 ```bash
 npm test
 ```
+
 
 Current tests:
 - `test/session-store.test.ts` (in-memory + sqlite persistence/limit)
@@ -15,13 +24,13 @@ Current tests:
 - `test/agent-runner.test.ts` (provider delegation + tool loop)
 - `test/model-provider.test.ts` (env provider factory)
 
-### 1) Build check (mandatory)
+### 2) Build check (mandatory)
 
 ```bash
 npm run build
 ```
 
-### 2) HTTP smoke test (mandatory)
+### 3) HTTP smoke test (mandatory)
 
 ```bash
 curl -s localhost:8787/health
@@ -34,11 +43,11 @@ Expected:
 - `health` returns `{"status":"ok",...}`
 - `inbound` returns `{ ok: true, sessionId, response }`
 
-### 3) Session continuity smoke (recommended)
+### 4) Session continuity smoke (recommended)
 
 Send two messages with same `userId`, verify turn increments.
 
-### 4) SQLite persistence smoke (recommended)
+### 5) SQLite persistence smoke (recommended)
 
 ```bash
 export SESSION_STORE=sqlite

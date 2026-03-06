@@ -45,9 +45,10 @@ npm run dev
 ## Test
 
 ```bash
-npm run build
-npm test
+npm run check
 ```
+
+(Equivalent to `npm run build && npm test`.)
 
 ## HTTP smoke test
 
