@@ -5,6 +5,7 @@ import { InMemorySessionStore, SqliteSessionStore, type SessionStore } from './c
 import { AgentRunner } from './core/agent-runner.js';
 import { InMemoryEventBus } from './core/bus.js';
 import { errorEnvelope } from './core/error-envelope.js';
+import { MessageOrchestrator } from './core/message-orchestrator.js';
 
 export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStore; mode: string; dbPath?: string } {
   const mode = (env.SESSION_STORE || 'memory').toLowerCase();
@@ -20,7 +21,8 @@ export function createApp(store?: SessionStore) {
   const resolvedStore = store ?? createStoreFromEnv(process.env).store;
   const maxHistoryMessages = Number.parseInt(process.env.AGENT_HISTORY_WINDOW || '20', 10);
   const bus = new InMemoryEventBus();
-  const router = new Router(resolvedStore, new AgentRunner(), Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages, bus);
+  const router = new Router(resolvedStore, Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages, bus);
+  const orchestrator = new MessageOrchestrator(router, new AgentRunner());
 
   app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 
@@ -40,7 +42,7 @@ export function createApp(store?: SessionStore) {
 
     const body = parsed.data;
     try {
-      const out = router.handleInbound({
+      const out = orchestrator.handleInbound({
         channel: 'webhook',
         userId: body.userId,
         threadId: body.threadId,
@@ -56,5 +58,5 @@ export function createApp(store?: SessionStore) {
     }
   });
 
-  return { app, router };
+  return { app, router, orchestrator };
 }

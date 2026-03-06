@@ -1,4 +1,4 @@
-import { Router } from '../core/router.js';
+import { MessageOrchestrator } from '../core/message-orchestrator.js';
 import { errorEnvelope } from '../core/error-envelope.js';
 
 type TelegramUpdate = {
@@ -17,7 +17,7 @@ export class TelegramPoller {
 
   constructor(
     private readonly token: string,
-    private readonly router: Router,
+    private readonly orchestrator: MessageOrchestrator,
   ) {}
 
   async start(): Promise<void> {
@@ -92,7 +92,7 @@ export class TelegramPoller {
       }),
     );
 
-    const out = this.router.handleInbound({
+    const out = this.orchestrator.handleInbound({
       channel: 'telegram',
       userId,
       threadId,

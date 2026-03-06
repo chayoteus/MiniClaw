@@ -12,10 +12,11 @@ MiniClaw is a minimal educational agent runtime inspired by OpenClaw.
 
 ```text
 Inbound Adapter (Webhook / Telegram Polling)
-  -> Router
-    -> Session Store
-      -> Agent Runner
-    -> Event Bus (in-memory)
+  -> Message Orchestrator
+    -> Router
+      -> Session Store
+      -> Event Bus (in-memory)
+    -> Agent Runner
   -> Outbound Adapter (Telegram send)
 ```
 
@@ -26,7 +27,9 @@ Inbound Adapter (Webhook / Telegram Polling)
 - `src/core/types.ts`
   - Shared domain types (inbound, chat message, reply)
 - `src/core/router.ts`
-  - Message orchestration and session id construction
+  - Session routing, history windowing, and event publishing
+- `src/core/message-orchestrator.ts`
+  - Orchestrates router ingest + agent runner + assistant emit
 - `src/core/session-store.ts`
   - In-memory session history storage
 - `src/core/bus.ts`
@@ -44,10 +47,10 @@ Inbound Adapter (Webhook / Telegram Polling)
 
 1. `POST /inbound` receives `{ userId, threadId?, text }`
 2. payload validated by Zod
-3. `Router.handleInbound(...)` creates `sessionId`
-4. user message appended to session store
-5. `AgentRunner.run(...)` generates reply
-6. assistant message appended to session store
+3. `MessageOrchestrator.handleInbound(...)` starts unified pipeline
+4. `Router.ingestInbound(...)` creates `sessionId`, appends user message, publishes inbound event
+5. `AgentRunner.run(...)` generates reply from turn + history
+6. `Router.emitAssistant(...)` appends assistant message and publishes outbound event
 7. response returned as JSON
 
 Unified error contract (current, used by webhook responses and adapter error payloads):
@@ -67,7 +70,7 @@ Unified error contract (current, used by webhook responses and adapter error pay
 
 1. `TelegramPoller` polls `getUpdates`
 2. message update normalized to `InboundMessage`
-3. forwarded to same `Router.handleInbound(...)`
+3. forwarded to same `MessageOrchestrator.handleInbound(...)`
 4. response posted to Telegram via `sendMessage`
 
 ## Session id convention

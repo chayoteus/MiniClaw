@@ -1,18 +1,22 @@
-import { AgentRunner } from './agent-runner.js';
 import type { EventBus } from './bus.js';
 import { NoopEventBus } from './bus.js';
 import type { SessionStore } from './session-store.js';
 import type { InboundMessage } from './types.js';
 
+export type InboundContext = {
+  sessionId: string;
+  history: ReturnType<SessionStore['getHistory']>;
+  turn: number;
+};
+
 export class Router {
   constructor(
     private readonly store: SessionStore,
-    private readonly runner: AgentRunner,
     private readonly maxHistoryMessages = 20,
     private readonly bus: EventBus = new NoopEventBus(),
   ) {}
 
-  handleInbound(msg: InboundMessage): { response: string; sessionId: string } {
+  ingestInbound(msg: InboundMessage): InboundContext {
     const sessionId = `${msg.channel}:${msg.userId}:${msg.threadId ?? 'default'}`;
     const fullHistory = this.store.getHistory(sessionId);
     const turn = fullHistory.filter((m) => m.role === 'user').length + 1;
@@ -25,15 +29,15 @@ export class Router {
       ts: Date.now(),
     });
 
-    const out = this.runner.run({ inbound: msg, history, turn });
+    return { sessionId, history, turn };
+  }
 
-    this.store.append(sessionId, { role: 'assistant', content: out.text, ts: Date.now() });
+  emitAssistant(sessionId: string, channel: InboundMessage['channel'], text: string): void {
+    this.store.append(sessionId, { role: 'assistant', content: text, ts: Date.now() });
     this.bus.publish({
       topic: 'outbound.generated',
-      payload: { sessionId, channel: msg.channel },
+      payload: { sessionId, channel },
       ts: Date.now(),
     });
-
-    return { response: out.text, sessionId };
   }
 }

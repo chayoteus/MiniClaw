@@ -12,11 +12,12 @@ A minimal, educational agent runtime inspired by OpenClaw.
 
 ```text
 Adapter (Telegram/Web)
-  -> Router
-    -> SessionStore (SQLite)
-      -> AgentRunner
-        -> ModelProvider
-        -> ToolRuntime
+  -> MessageOrchestrator
+    -> Router
+      -> SessionStore (SQLite)
+    -> AgentRunner
+      -> ModelProvider
+      -> ToolRuntime
   -> Sender
 ```
 
@@ -25,7 +26,7 @@ Adapter (Telegram/Web)
 - [x] v0.1: message in -> model -> message out (Telegram)
 - [x] v0.1.1: SQLite session memory
 - [x] v0.2: tool calling loop (minimal runtime)
-- [ ] v0.3: mini-gateway bus abstraction
+- [x] v0.3: mini-gateway bus abstraction + adapter/orchestrator decoupling
 
 ## Tech
 

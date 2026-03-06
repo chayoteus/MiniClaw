@@ -30,7 +30,7 @@
 ## v0.3
 
 - [x] Mini-gateway bus abstraction (in-memory first, core pub/sub scaffold)
-- [ ] Decouple adapters from direct runner invocation
+- [x] Decouple adapters from direct runner invocation (via MessageOrchestrator)
 - [ ] Prepare for pluggable channels/providers
 
 ## Non-goals (for now)
