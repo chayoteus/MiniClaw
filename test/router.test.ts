@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Router } from '../src/core/router.js';
 import { InMemorySessionStore } from '../src/core/session-store.js';
 import { AgentRunner } from '../src/core/agent-runner.js';
+import { InMemoryEventBus } from '../src/core/bus.js';
 
 describe('Router', () => {
   it('builds stable session id and increments turns', () => {
@@ -36,5 +37,18 @@ describe('Router', () => {
     expect(r1.response).toContain('Turn 1');
     expect(r2.response).toContain('Turn 2');
     expect(r3.response).toContain('Turn 3');
+  });
+
+  it('publishes inbound and outbound events via event bus', () => {
+    const bus = new InMemoryEventBus();
+    const router = new Router(new InMemorySessionStore(), new AgentRunner(), 20, bus);
+    const topics: string[] = [];
+
+    bus.subscribe('inbound.received', (event) => topics.push(event.topic));
+    bus.subscribe('outbound.generated', (event) => topics.push(event.topic));
+
+    router.handleInbound({ channel: 'webhook', userId: 'u3', text: 'ping', ts: Date.now() });
+
+    expect(topics).toEqual(['inbound.received', 'outbound.generated']);
   });
 });

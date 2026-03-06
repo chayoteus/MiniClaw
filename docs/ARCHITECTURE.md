@@ -15,6 +15,7 @@ Inbound Adapter (Webhook / Telegram Polling)
   -> Router
     -> Session Store
       -> Agent Runner
+    -> Event Bus (in-memory)
   -> Outbound Adapter (Telegram send)
 ```
 
@@ -28,6 +29,8 @@ Inbound Adapter (Webhook / Telegram Polling)
   - Message orchestration and session id construction
 - `src/core/session-store.ts`
   - In-memory session history storage
+- `src/core/bus.ts`
+  - Event bus contract + in-memory/no-op implementations
 - `src/core/model-provider.ts`
   - ModelProvider abstraction + default EchoModelProvider
 - `src/core/agent-runner.ts`
@@ -81,4 +84,4 @@ Examples:
 - Replace in-memory store with SQLite backend
 - Add model provider abstraction
 - Add tool runtime loop
-- Introduce mini-gateway bus abstraction (v0.2)
+- Extend event bus from in-memory pub/sub into mini-gateway transport (v0.3)

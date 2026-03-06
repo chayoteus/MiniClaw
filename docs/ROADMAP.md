@@ -29,7 +29,7 @@
 
 ## v0.3
 
-- [ ] Mini-gateway bus abstraction (in-memory first)
+- [x] Mini-gateway bus abstraction (in-memory first, core pub/sub scaffold)
 - [ ] Decouple adapters from direct runner invocation
 - [ ] Prepare for pluggable channels/providers
 

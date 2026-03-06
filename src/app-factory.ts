@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Router } from './core/router.js';
 import { InMemorySessionStore, SqliteSessionStore, type SessionStore } from './core/session-store.js';
 import { AgentRunner } from './core/agent-runner.js';
+import { InMemoryEventBus } from './core/bus.js';
 import { errorEnvelope } from './core/error-envelope.js';
 
 export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStore; mode: string; dbPath?: string } {
@@ -18,7 +19,8 @@ export function createApp(store?: SessionStore) {
   const app = Fastify({ logger: true });
   const resolvedStore = store ?? createStoreFromEnv(process.env).store;
   const maxHistoryMessages = Number.parseInt(process.env.AGENT_HISTORY_WINDOW || '20', 10);
-  const router = new Router(resolvedStore, new AgentRunner(), Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages);
+  const bus = new InMemoryEventBus();
+  const router = new Router(resolvedStore, new AgentRunner(), Number.isNaN(maxHistoryMessages) ? 20 : maxHistoryMessages, bus);
 
   app.get('/health', async () => ({ status: 'ok', service: 'MiniClaw' }));
 

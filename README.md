@@ -24,7 +24,7 @@ Adapter (Telegram/Web)
 
 - [x] v0.1: message in -> model -> message out (Telegram)
 - [x] v0.1.1: SQLite session memory
-- [ ] v0.2: tool calling loop (exec + web_search)
+- [x] v0.2: tool calling loop (minimal runtime)
 - [ ] v0.3: mini-gateway bus abstraction
 
 ## Tech
