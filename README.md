@@ -168,15 +168,31 @@ OPENAI_OAUTH_REDIRECT_URI=...
 npm run cli -- auth login
 ```
 
-`auth login` prints an OpenAI OAuth authorize URL and temporary PKCE values (`state`, `code_verifier`).
+`auth login` prints an OpenAI OAuth authorize URL and PKCE values (`state`, `code_verifier`).
 
-`auth complete` now supports manual callback paste + state verification:
+`auth complete` supports manual callback paste + state verification, then exchanges authorization code for tokens and stores them locally:
 
 ```bash
 miniclaw auth complete "<callback_url_from_browser>" --state "<state_from_login>" --code-verifier "<code_verifier_from_login>"
 ```
 
-Current limitation: token exchange + secure local storage are still pending. `auth status` / `auth logout` are placeholders.
+Check login state:
+
+```bash
+miniclaw auth status
+```
+
+Clear local tokens:
+
+```bash
+miniclaw auth logout
+```
+
+Token storage defaults to:
+- `~/.config/miniclaw/oauth-token.json` (file mode `0600`)
+- Override with `MINICLAW_OAUTH_TOKEN_PATH`
+
+Current limitation: token auto-refresh and OpenAI provider integration are still pending.
 
 ## Documentation
 

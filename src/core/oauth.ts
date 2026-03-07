@@ -6,6 +6,7 @@ export interface OAuthClientConfig {
   clientId: string;
   redirectUri: string;
   scope: string;
+  tokenUrl?: string;
 }
 
 export interface OAuthPkceSeed {
@@ -17,6 +18,14 @@ export interface OAuthPkceSeed {
 export type OAuthCallbackResult =
   | { ok: true; code: string; state: string }
   | { ok: false; error: string };
+
+export interface OAuthTokenExchangeResult {
+  accessToken: string;
+  refreshToken?: string;
+  tokenType: string;
+  scope?: string;
+  expiresIn?: number;
+}
 
 export function createPkceSeed(): OAuthPkceSeed {
   const state = randomBytes(16).toString('base64url');
@@ -64,4 +73,52 @@ export function parseOAuthCallback(callbackUrl: string, expectedState: string): 
   }
 
   return { ok: true, code, state };
+}
+
+export async function exchangeAuthorizationCode(params: {
+  tokenUrl: string;
+  clientId: string;
+  redirectUri: string;
+  code: string;
+  codeVerifier: string;
+}): Promise<OAuthTokenExchangeResult> {
+  const body = new URLSearchParams({
+    grant_type: 'authorization_code',
+    client_id: params.clientId,
+    redirect_uri: params.redirectUri,
+    code: params.code,
+    code_verifier: params.codeVerifier
+  });
+
+  const response = await fetch(params.tokenUrl, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body
+  });
+
+  if (!response.ok) {
+    throw new Error(`token_exchange_failed:${response.status}`);
+  }
+
+  const data = (await response.json()) as {
+    access_token?: string;
+    refresh_token?: string;
+    token_type?: string;
+    scope?: string;
+    expires_in?: number;
+  };
+
+  if (!data.access_token || !data.token_type) {
+    throw new Error('token_exchange_invalid_response');
+  }
+
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token,
+    tokenType: data.token_type,
+    scope: data.scope,
+    expiresIn: data.expires_in
+  };
 }

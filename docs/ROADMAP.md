@@ -38,10 +38,10 @@
 - [x] CLI auth flow: print OAuth URL (`miniclaw auth login`)
 - [x] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url> --state <state> --code-verifier <code_verifier>`)
 - [x] PKCE + state verification
-- [ ] Access/refresh token exchange and secure local storage
+- [x] Access/refresh token exchange and secure local storage
 - [ ] Token auto-refresh for provider calls
 - [ ] OpenAI provider integration using OAuth access token
-- [ ] `auth status` / `auth logout` commands
+- [x] `auth status` / `auth logout` commands
 - [ ] Tests + docs for auth and provider path
 
 ## Non-goals (for now)

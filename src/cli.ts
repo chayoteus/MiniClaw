@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { buildAuthorizeUrl, createPkceSeed, parseOAuthCallback } from './core/oauth.js';
+import { buildAuthorizeUrl, createPkceSeed, exchangeAuthorizationCode, parseOAuthCallback } from './core/oauth.js';
+import { clearOAuthTokens, readOAuthTokens, writeOAuthTokens } from './core/token-store.js';
 
 const usage = [
   'Usage:',
@@ -9,16 +10,22 @@ const usage = [
   '  miniclaw auth logout'
 ].join('\n');
 
-function readLoginConfig(env: NodeJS.ProcessEnv): { clientId: string; redirectUri: string; scope: string } {
+function readLoginConfig(env: NodeJS.ProcessEnv): {
+  clientId: string;
+  redirectUri: string;
+  scope: string;
+  tokenUrl: string;
+} {
   const clientId = env.OPENAI_OAUTH_CLIENT_ID;
   const redirectUri = env.OPENAI_OAUTH_REDIRECT_URI;
   const scope = env.OPENAI_OAUTH_SCOPE ?? 'openid profile email offline_access';
+  const tokenUrl = env.OPENAI_OAUTH_TOKEN_URL ?? 'https://auth.openai.com/oauth/token';
 
   if (!clientId || !redirectUri) {
     throw new Error('Missing OPENAI_OAUTH_CLIENT_ID or OPENAI_OAUTH_REDIRECT_URI');
   }
 
-  return { clientId, redirectUri, scope };
+  return { clientId, redirectUri, scope, tokenUrl };
 }
 
 function readFlag(argv: string[], name: string): string | undefined {
@@ -27,7 +34,7 @@ function readFlag(argv: string[], name: string): string | undefined {
   return argv[index + 1];
 }
 
-export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): number {
+export async function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): Promise<number> {
   const [group, action, ...rest] = argv;
 
   if (group !== 'auth' || !action) {
@@ -42,7 +49,7 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): nu
 
     console.log('Open this URL to authenticate:');
     console.log(authorizeUrl);
-    console.log('Save these values for next step (temporary, until secure token store lands):');
+    console.log('Save these values for next step:');
     console.log(`state=${seed.state}`);
     console.log(`code_verifier=${seed.codeVerifier}`);
     return 0;
@@ -71,15 +78,67 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): nu
       return 1;
     }
 
-    console.log('OAuth callback validated.');
-    console.log(`authorization_code=${result.code}`);
-    console.log(`code_verifier=${codeVerifier}`);
-    console.log('Next step: exchange code for tokens and store securely (not implemented yet).');
+    const config = readLoginConfig(env);
+
+    try {
+      const tokenResult = await exchangeAuthorizationCode({
+        tokenUrl: config.tokenUrl,
+        clientId: config.clientId,
+        redirectUri: config.redirectUri,
+        code: result.code,
+        codeVerifier
+      });
+
+      const now = new Date();
+      const expiresAt =
+        typeof tokenResult.expiresIn === 'number'
+          ? new Date(now.getTime() + tokenResult.expiresIn * 1000).toISOString()
+          : undefined;
+
+      const path = await writeOAuthTokens(
+        {
+          accessToken: tokenResult.accessToken,
+          refreshToken: tokenResult.refreshToken,
+          tokenType: tokenResult.tokenType,
+          scope: tokenResult.scope,
+          obtainedAt: now.toISOString(),
+          expiresAt
+        },
+        env
+      );
+
+      console.log('OAuth token exchange succeeded and tokens saved.');
+      console.log(`token_store=${path}`);
+      return 0;
+    } catch (error) {
+      console.error(`OAuth token exchange failed: ${(error as Error).message}`);
+      return 1;
+    }
+  }
+
+  if (action === 'status') {
+    const tokens = await readOAuthTokens(env);
+    if (!tokens) {
+      console.log('Not logged in (no stored OAuth tokens).');
+      return 0;
+    }
+
+    const maskedAccessToken = `${tokens.accessToken.slice(0, 6)}...${tokens.accessToken.slice(-4)}`;
+    console.log('Logged in with stored OAuth tokens.');
+    console.log(`token_type=${tokens.tokenType}`);
+    console.log(`access_token=${maskedAccessToken}`);
+    if (tokens.expiresAt) console.log(`expires_at=${tokens.expiresAt}`);
+    if (tokens.scope) console.log(`scope=${tokens.scope}`);
     return 0;
   }
 
-  if (action === 'status' || action === 'logout') {
-    console.log(`Not implemented yet: miniclaw auth ${action}`);
+  if (action === 'logout') {
+    const removed = await clearOAuthTokens(env);
+    if (removed) {
+      console.log('Logged out. Stored OAuth tokens cleared.');
+    } else {
+      console.log('No stored OAuth tokens found.');
+    }
     return 0;
   }
 
@@ -88,6 +147,6 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): nu
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const exitCode = runCli(process.argv.slice(2));
+  const exitCode = await runCli(process.argv.slice(2));
   process.exitCode = exitCode;
 }
