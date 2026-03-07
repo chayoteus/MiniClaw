@@ -40,6 +40,8 @@ Inbound Adapter (Webhook / Telegram Polling)
   - OAuth PKCE helpers, callback parsing, token exchange + refresh grant helper
 - `src/core/token-store.ts`
   - Local OAuth token persistence/read/clear helpers
+- `src/core/oauth-session.ts`
+  - Access-token resolver with auto-refresh + persisted token rotation
 - `src/core/agent-runner.ts`
   - Runner that delegates text generation to ModelProvider
 - `src/adapters/telegram-poller.ts`

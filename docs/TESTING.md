@@ -24,6 +24,7 @@ Current tests:
 - `test/agent-runner.test.ts` (provider delegation + tool loop)
 - `test/model-provider.test.ts` (env provider factory)
 - `test/oauth.test.ts` (PKCE seed, authorize URL, callback state verification, token exchange, refresh token grant)
+- `test/oauth-session.test.ts` (stored access token resolve + auto-refresh persistence path)
 - `test/cli-auth.test.ts` (auth complete/status/logout with local token store)
 - `test/telegram-poller.test.ts` (poll cycle, update filtering, outbound send path)
 
