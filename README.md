@@ -192,7 +192,7 @@ Token storage defaults to:
 - `~/.config/miniclaw/oauth-token.json` (file mode `0600`)
 - Override with `MINICLAW_OAUTH_TOKEN_PATH`
 
-Current limitation: token auto-refresh and OpenAI provider integration are still pending.
+Current limitation: auto-refresh is implemented at OAuth helper level but not yet wired into provider calls; OpenAI provider integration is still pending.
 
 ## Documentation
 

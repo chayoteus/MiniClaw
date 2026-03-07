@@ -27,6 +27,12 @@ export interface OAuthTokenExchangeResult {
   expiresIn?: number;
 }
 
+export interface OAuthRefreshParams {
+  tokenUrl: string;
+  clientId: string;
+  refreshToken: string;
+}
+
 export function createPkceSeed(): OAuthPkceSeed {
   const state = randomBytes(16).toString('base64url');
   const codeVerifier = randomBytes(48).toString('base64url');
@@ -75,6 +81,28 @@ export function parseOAuthCallback(callbackUrl: string, expectedState: string): 
   return { ok: true, code, state };
 }
 
+async function parseTokenResponse(response: Response): Promise<OAuthTokenExchangeResult> {
+  const data = (await response.json()) as {
+    access_token?: string;
+    refresh_token?: string;
+    token_type?: string;
+    scope?: string;
+    expires_in?: number;
+  };
+
+  if (!data.access_token || !data.token_type) {
+    throw new Error('token_exchange_invalid_response');
+  }
+
+  return {
+    accessToken: data.access_token,
+    refreshToken: data.refresh_token,
+    tokenType: data.token_type,
+    scope: data.scope,
+    expiresIn: data.expires_in
+  };
+}
+
 export async function exchangeAuthorizationCode(params: {
   tokenUrl: string;
   clientId: string;
@@ -102,23 +130,27 @@ export async function exchangeAuthorizationCode(params: {
     throw new Error(`token_exchange_failed:${response.status}`);
   }
 
-  const data = (await response.json()) as {
-    access_token?: string;
-    refresh_token?: string;
-    token_type?: string;
-    scope?: string;
-    expires_in?: number;
-  };
+  return parseTokenResponse(response);
+}
 
-  if (!data.access_token || !data.token_type) {
-    throw new Error('token_exchange_invalid_response');
+export async function refreshOAuthAccessToken(params: OAuthRefreshParams): Promise<OAuthTokenExchangeResult> {
+  const body = new URLSearchParams({
+    grant_type: 'refresh_token',
+    client_id: params.clientId,
+    refresh_token: params.refreshToken
+  });
+
+  const response = await fetch(params.tokenUrl, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    body
+  });
+
+  if (!response.ok) {
+    throw new Error(`token_refresh_failed:${response.status}`);
   }
 
-  return {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token,
-    tokenType: data.token_type,
-    scope: data.scope,
-    expiresIn: data.expires_in
-  };
+  return parseTokenResponse(response);
 }

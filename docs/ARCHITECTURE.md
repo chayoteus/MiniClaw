@@ -37,7 +37,7 @@ Inbound Adapter (Webhook / Telegram Polling)
 - `src/core/model-provider.ts`
   - ModelProvider abstraction + env-based provider factory (`echo`/`rule`)
 - `src/core/oauth.ts`
-  - OAuth PKCE helpers, callback parsing, token exchange
+  - OAuth PKCE helpers, callback parsing, token exchange + refresh grant helper
 - `src/core/token-store.ts`
   - Local OAuth token persistence/read/clear helpers
 - `src/core/agent-runner.ts`

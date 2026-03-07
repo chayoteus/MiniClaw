@@ -3,7 +3,8 @@ import {
   buildAuthorizeUrl,
   createPkceSeed,
   exchangeAuthorizationCode,
-  parseOAuthCallback
+  parseOAuthCallback,
+  refreshOAuthAccessToken
 } from '../src/core/oauth.js';
 
 describe('oauth helpers', () => {
@@ -83,5 +84,41 @@ describe('oauth helpers', () => {
       scope: 'openid',
       expiresIn: 3600
     });
+  });
+
+  it('refreshes access token with refresh_token grant', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        access_token: 'new_access_456',
+        refresh_token: 'new_refresh_456',
+        token_type: 'Bearer',
+        expires_in: 1800
+      })
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await refreshOAuthAccessToken({
+      tokenUrl: 'https://auth.openai.com/oauth/token',
+      clientId: 'client_123',
+      refreshToken: 'refresh_123'
+    });
+
+    expect(result).toEqual({
+      accessToken: 'new_access_456',
+      refreshToken: 'new_refresh_456',
+      tokenType: 'Bearer',
+      expiresIn: 1800
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const call = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe('https://auth.openai.com/oauth/token');
+    expect(call[1].method).toBe('POST');
+
+    const body = call[1].body as URLSearchParams;
+    expect(body.get('grant_type')).toBe('refresh_token');
+    expect(body.get('client_id')).toBe('client_123');
+    expect(body.get('refresh_token')).toBe('refresh_123');
   });
 });
