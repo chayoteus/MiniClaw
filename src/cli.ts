@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-import { buildAuthorizeUrl, createPkceSeed } from './core/oauth.js';
+import { buildAuthorizeUrl, createPkceSeed, parseOAuthCallback } from './core/oauth.js';
 
 const usage = [
   'Usage:',
   '  miniclaw auth login',
-  '  miniclaw auth complete <callback_url>',
+  '  miniclaw auth complete <callback_url> --state <state> --code-verifier <code_verifier>',
   '  miniclaw auth status',
   '  miniclaw auth logout'
 ].join('\n');
@@ -21,8 +21,14 @@ function readLoginConfig(env: NodeJS.ProcessEnv): { clientId: string; redirectUr
   return { clientId, redirectUri, scope };
 }
 
+function readFlag(argv: string[], name: string): string | undefined {
+  const index = argv.indexOf(name);
+  if (index === -1) return undefined;
+  return argv[index + 1];
+}
+
 export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): number {
-  const [group, action] = argv;
+  const [group, action, ...rest] = argv;
 
   if (group !== 'auth' || !action) {
     console.log(usage);
@@ -42,7 +48,37 @@ export function runCli(argv: string[], env: NodeJS.ProcessEnv = process.env): nu
     return 0;
   }
 
-  if (action === 'complete' || action === 'status' || action === 'logout') {
+  if (action === 'complete') {
+    const callbackUrl = rest[0];
+    const expectedState = readFlag(rest, '--state');
+    const codeVerifier = readFlag(rest, '--code-verifier');
+
+    if (!callbackUrl) {
+      console.log('Missing callback URL.');
+      console.log(usage);
+      return 1;
+    }
+
+    if (!expectedState || !codeVerifier) {
+      console.log('Missing --state or --code-verifier.');
+      console.log(usage);
+      return 1;
+    }
+
+    const result = parseOAuthCallback(callbackUrl, expectedState);
+    if (!result.ok) {
+      console.error(`OAuth callback validation failed: ${result.error}`);
+      return 1;
+    }
+
+    console.log('OAuth callback validated.');
+    console.log(`authorization_code=${result.code}`);
+    console.log(`code_verifier=${codeVerifier}`);
+    console.log('Next step: exchange code for tokens and store securely (not implemented yet).');
+    return 0;
+  }
+
+  if (action === 'status' || action === 'logout') {
     console.log(`Not implemented yet: miniclaw auth ${action}`);
     return 0;
   }

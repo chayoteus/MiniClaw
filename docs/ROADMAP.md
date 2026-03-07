@@ -36,8 +36,8 @@
 ## v0.4 (OAuth + real LLM)
 
 - [x] CLI auth flow: print OAuth URL (`miniclaw auth login`)
-- [ ] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url>`)
-- [ ] PKCE + state verification
+- [x] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url> --state <state> --code-verifier <code_verifier>`)
+- [x] PKCE + state verification
 - [ ] Access/refresh token exchange and secure local storage
 - [ ] Token auto-refresh for provider calls
 - [ ] OpenAI provider integration using OAuth access token

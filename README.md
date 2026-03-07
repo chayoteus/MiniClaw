@@ -168,17 +168,15 @@ OPENAI_OAUTH_REDIRECT_URI=...
 npm run cli -- auth login
 ```
 
-`auth login` now prints an OpenAI OAuth authorize URL and temporary PKCE values (`state`, `code_verifier`) for manual testing.
+`auth login` prints an OpenAI OAuth authorize URL and temporary PKCE values (`state`, `code_verifier`).
 
-Planned next commands:
+`auth complete` now supports manual callback paste + state verification:
 
 ```bash
-miniclaw auth complete "<callback_url_from_browser>"
-miniclaw auth status
-miniclaw auth logout
+miniclaw auth complete "<callback_url_from_browser>" --state "<state_from_login>" --code-verifier "<code_verifier_from_login>"
 ```
 
-Final target remains Authorization Code + PKCE with secure local token storage for OpenAI provider calls.
+Current limitation: token exchange + secure local storage are still pending. `auth status` / `auth logout` are placeholders.
 
 ## Documentation
 
