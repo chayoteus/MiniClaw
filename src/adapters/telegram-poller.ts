@@ -123,7 +123,7 @@ export class TelegramPoller {
       }),
     );
 
-    const out = this.orchestrator.handleInbound({
+    const out = await this.orchestrator.handleInbound({
       channel: 'telegram',
       userId,
       threadId,

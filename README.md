@@ -47,7 +47,7 @@ Outbound
 - [x] v0.1.1: SQLite session memory
 - [x] v0.2: tool calling loop (minimal runtime)
 - [x] v0.3: mini-gateway bus abstraction + adapter/orchestrator decoupling + provider plug baseline
-- [ ] v0.4: OAuth CLI login flow + real OpenAI provider integration
+- [x] v0.4: OAuth CLI login flow + OpenAI OAuth provider integration
 
 ## Tech
 
@@ -122,6 +122,15 @@ Optional demo rule provider:
 export MODEL_PROVIDER=rule
 ```
 
+OAuth-backed OpenAI provider:
+
+```bash
+export MODEL_PROVIDER=openai-oauth
+# optional overrides
+export OPENAI_MODEL=gpt-4.1-mini
+export OPENAI_API_URL=https://api.openai.com/v1/responses
+```
+
 When `rule` is enabled:
 - `upper hello` triggers `text.uppercase`
 - `time` triggers `time.now`
@@ -192,7 +201,7 @@ Token storage defaults to:
 - `~/.config/miniclaw/oauth-token.json` (file mode `0600`)
 - Override with `MINICLAW_OAUTH_TOKEN_PATH`
 
-Current status: stored-token resolver now auto-refreshes and persists new tokens for provider-call wiring; OpenAI provider integration is still pending.
+Current status: OpenAI OAuth provider path is now wired (`MODEL_PROVIDER=openai-oauth`) and uses stored/auto-refreshed tokens for `/v1/responses` calls.
 
 ## Documentation
 

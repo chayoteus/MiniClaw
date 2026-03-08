@@ -8,9 +8,9 @@ export class MessageOrchestrator {
     private readonly runner: AgentRunner,
   ) {}
 
-  handleInbound(msg: InboundMessage): { response: string; sessionId: string } {
+  async handleInbound(msg: InboundMessage): Promise<{ response: string; sessionId: string }> {
     const context = this.router.ingestInbound(msg);
-    const out = this.runner.run({
+    const out = await this.runner.run({
       inbound: msg,
       history: context.history,
       turn: context.turn,

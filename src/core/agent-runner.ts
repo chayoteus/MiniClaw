@@ -8,9 +8,9 @@ export class AgentRunner {
     private readonly toolRuntime: ToolRuntime = new ToolRuntime(),
   ) {}
 
-  run(input: AgentRunInput): AgentReply {
+  async run(input: AgentRunInput): Promise<AgentReply> {
     const text = input.inbound.text.trim();
-    const modelOutput = this.modelProvider.generate({
+    const modelOutput = await this.modelProvider.generate({
       turn: input.turn,
       inputText: text,
       history: input.history,

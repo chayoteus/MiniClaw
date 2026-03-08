@@ -40,9 +40,9 @@
 - [x] PKCE + state verification
 - [x] Access/refresh token exchange and secure local storage
 - [x] Token auto-refresh wiring scaffold for provider calls (stored token resolver + refresh persist)
-- [ ] OpenAI provider integration using OAuth access token
+- [x] OpenAI provider integration using OAuth access token
 - [x] `auth status` / `auth logout` commands
-- [ ] Tests + docs for auth and provider path
+- [x] Tests + docs for auth and provider path
 
 ## Non-goals (for now)
 

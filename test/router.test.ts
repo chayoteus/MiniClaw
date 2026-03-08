@@ -90,12 +90,12 @@ describe('Router', () => {
 });
 
 describe('MessageOrchestrator', () => {
-  it('executes runner and emits assistant output through router', () => {
+  it('executes runner and emits assistant output through router', async () => {
     const router = new Router(new InMemorySessionStore());
     const orchestrator = new MessageOrchestrator(router, new AgentRunner());
 
-    const r1 = orchestrator.handleInbound({ channel: 'webhook', userId: 'u4', text: 'hello', ts: Date.now() });
-    const r2 = orchestrator.handleInbound({ channel: 'webhook', userId: 'u4', text: 'again', ts: Date.now() });
+    const r1 = await orchestrator.handleInbound({ channel: 'webhook', userId: 'u4', text: 'hello', ts: Date.now() });
+    const r2 = await orchestrator.handleInbound({ channel: 'webhook', userId: 'u4', text: 'again', ts: Date.now() });
 
     expect(r1.response).toContain('Turn 1');
     expect(r2.response).toContain('Turn 2');

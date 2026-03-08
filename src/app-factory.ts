@@ -44,7 +44,7 @@ export function createApp(store?: SessionStore) {
 
     const body = parsed.data;
     try {
-      const out = orchestrator.handleInbound({
+      const out = await orchestrator.handleInbound({
         channel: 'webhook',
         userId: body.userId,
         threadId: body.threadId,

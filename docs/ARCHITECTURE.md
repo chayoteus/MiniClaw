@@ -35,7 +35,7 @@ Inbound Adapter (Webhook / Telegram Polling)
 - `src/core/bus.ts`
   - Event bus contract + in-memory/no-op implementations
 - `src/core/model-provider.ts`
-  - ModelProvider abstraction + env-based provider factory (`echo`/`rule`)
+  - Async ModelProvider abstraction + env-based provider factory (`echo`/`rule`/`openai-oauth`)
 - `src/core/oauth.ts`
   - OAuth PKCE helpers, callback parsing, token exchange + refresh grant helper
 - `src/core/token-store.ts`
