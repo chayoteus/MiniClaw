@@ -8,7 +8,7 @@ A minimal, educational agent runtime inspired by OpenClaw.
 2. Keep architecture simple enough for readers to understand quickly.
 3. Build in public with clear milestones.
 
-## Architecture (v0.1)
+## Architecture (v0.4 baseline)
 
 ```text
 Inbound

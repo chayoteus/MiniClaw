@@ -1,6 +1,6 @@
 # MiniClaw Roadmap
 
-## v0.1 (current)
+## v0.1 (foundation)
 
 - [x] TypeScript project scaffold
 - [x] Fastify app with `/health` and `/inbound`
@@ -33,7 +33,7 @@
 - [x] Decouple adapters from direct runner invocation (via MessageOrchestrator)
 - [x] Prepare for pluggable channels/providers (env-selected model provider baseline)
 
-## v0.4 (OAuth + real LLM)
+## v0.4 (current: OAuth + real LLM)
 
 - [x] CLI auth flow: print OAuth URL (`miniclaw auth login`)
 - [x] Manual callback URL paste back into CLI (`miniclaw auth complete <callback_url> --state <state> --code-verifier <code_verifier>`)
