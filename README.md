@@ -167,7 +167,7 @@ Then message your bot in Telegram. MiniClaw will route inbound text through the 
 
 > Note: this is a minimal educational adapter (polling mode). Webhook + richer Telegram features can be added later.
 
-## OAuth CLI flow (v0.4, in progress)
+## OAuth CLI flow (v0.4)
 
 Current status:
 
