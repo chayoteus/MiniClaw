@@ -51,7 +51,7 @@ Outbound
 
 ## Tech
 
-- TypeScript (Node 20)
+- TypeScript (Node 20+)
 - Fastify
 - SQLite (better-sqlite3)
 - Zod
