@@ -17,8 +17,8 @@ export function createStoreFromEnv(env: NodeJS.ProcessEnv): { store: SessionStor
   return { store: new InMemorySessionStore(), mode };
 }
 
-export function createApp(store?: SessionStore) {
-  const app = Fastify({ logger: true });
+export function createApp(store?: SessionStore, options?: { logger?: boolean }) {
+  const app = Fastify({ logger: options?.logger ?? true });
   const resolvedStore = store ?? createStoreFromEnv(process.env).store;
   const maxHistoryMessages = Number.parseInt(process.env.AGENT_HISTORY_WINDOW || '20', 10);
   const bus = new InMemoryEventBus();

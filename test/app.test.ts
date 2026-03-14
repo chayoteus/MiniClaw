@@ -4,7 +4,7 @@ import { InMemorySessionStore } from '../src/core/session-store.js';
 
 describe('App', () => {
   it('returns health', async () => {
-    const { app } = createApp(new InMemorySessionStore());
+    const { app } = createApp(new InMemorySessionStore(), { logger: false });
     const res = await app.inject({ method: 'GET', url: '/health' });
     expect(res.statusCode).toBe(200);
     const body = res.json();
@@ -13,7 +13,7 @@ describe('App', () => {
   });
 
   it('runs inbound pipeline', async () => {
-    const { app } = createApp(new InMemorySessionStore());
+    const { app } = createApp(new InMemorySessionStore(), { logger: false });
 
     const r1 = await app.inject({
       method: 'POST',
@@ -36,7 +36,7 @@ describe('App', () => {
   });
 
   it('returns standardized error envelope on invalid payload', async () => {
-    const { app } = createApp(new InMemorySessionStore());
+    const { app } = createApp(new InMemorySessionStore(), { logger: false });
     const res = await app.inject({
       method: 'POST',
       url: '/inbound',
